@@ -10,11 +10,11 @@ export default class MainScene extends Phaser.Scene {
 
   preload() {
     this.load.image("starField", "assets/starField/bg_space_seamless.png");
-    this.load.image("playerShip", "assets/player/Blue_Player_Ship_2.png");
+    this.load.image("player", "assets/player/Blue_Player_Ship_2.png");
   }
 
   create() {
-    const starField = this.add.image(0, 0, "starField");
+    let starField = this.add.image(0, 0, "starField");
     const scale = calculateBgScale(
       starField.width,
       starField.height,
@@ -24,8 +24,8 @@ export default class MainScene extends Phaser.Scene {
     starField.setScale(scale);
     starField.setOrigin(0, 0);
     starField.setPosition(0, 0);
-    this.playerShip = this.add.image(600, 400, "playerShip");
-    playerShip.setScale(0.5);
+    let player = this.add.image(600, 400, "playerShip");
+    player.setScale(0.5);
   }
 
   update() {}
