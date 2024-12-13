@@ -6,6 +6,7 @@ export const gameConfig: Phaser.Types.Core.GameConfig = {
   width: 1200, // Game width
   height: 800, // Game height
   scene: [MainScene], // Register your scene here
+  input: { gamepad: true },
   physics: {
     default: "arcade", // Physics system
     arcade: {
