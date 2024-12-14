@@ -5,6 +5,8 @@ export default class MainScene extends Phaser.Scene {
   private player!: Phaser.Physics.Arcade.Sprite;
   private cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
   private pad?: Phaser.Input.Gamepad.Gamepad;
+  private nebula01: Phaser.Physics.Arcade.Sprite;
+
   constructor() {
     super({
       key: "MainScene",
@@ -14,6 +16,7 @@ export default class MainScene extends Phaser.Scene {
   preload() {
     this.load.image("starField", "assets/starField/bg_space_seamless.png");
     this.load.image("player", "assets/player/Blue_Player_Ship_2.png");
+    this.load.image("nebula_01.png", "assets/nebula/nebula2.png");
   }
 
   create() {
@@ -28,6 +31,30 @@ export default class MainScene extends Phaser.Scene {
     starField.setScale(scale);
     starField.setOrigin(0, 0);
     starField.setPosition(0, 0);
+
+    // add nebula parallax layer 1
+    let nebula_01 = this.add.image(0, 0, "nebula_01");
+    const neb_01_scale = calculateBgScale(
+      nebula_01.width,
+      nebula_01.height,
+      this.scale.width,
+      this.scale.height
+    );
+    nebula_01.setScale(neb_01_scale);
+    nebula_01.setOrigin(0, 0);
+    nebula_01.setPosition(0, 0);
+
+    // second layer for parallax
+    let nebula_02 = this.add.image(0, 0, "nebula_01");
+    // const neb_02_scale = calculateBgScale(
+    //   nebula_02.width,
+    //   nebula_02.height,
+    //   this.scale.width,
+    //   this.scale.height
+    // );
+    // nebula_02.setScale(neb_01_scale);
+    // nebula_02.setOrigin(0, 0);
+    // nebula_02.setPosition(0, 0);
 
     // add player with physics
     this.player = this.physics.add.sprite(600, 400, "player");
