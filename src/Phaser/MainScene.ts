@@ -17,13 +17,16 @@ export default class MainScene extends Phaser.Scene {
 
   preload() {
     this.load.image("starField", "assets/starField/bg_space_seamless.png");
-    this.load.image("player", "assets/player/Blue_Player_Ship_2.png");
     this.load.image("nebula01", "assets/nebula/nebula2.png");
     this.load.image("nebula02", "assets/nebula/nebuladrystars.png");
     this.load.image(
       "parallaxStarField",
       "assets/starField/bd_space_seamless_fl1.png"
     );
+    this.load.spritesheet("player", "assets/player/player_blue_sheet.png", {
+      frameWidth: 117,
+      frameHeight: 95,
+    });
   }
 
   create() {
@@ -78,6 +81,14 @@ export default class MainScene extends Phaser.Scene {
     this.player.setCollideWorldBounds(true);
     this.player.setBounce(0.2);
 
+    // set player engine animation
+    this.anims.create({
+      key: "player_engine",
+      frames: this.anims.generateFrameNumbers("player", { start: 0, end: 2 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
     // setup cursor keys
     if (this.input.keyboard) {
       this.cursors = this.input.keyboard.createCursorKeys();
@@ -95,9 +106,12 @@ export default class MainScene extends Phaser.Scene {
 
   update() {
     // PARALLAX BACKGROUND MOVEMENT
-    this.nebula01.tilePositionY -= 0.5;
-    this.nebula02.tilePositionY -= 0.25;
+    this.nebula01.tilePositionY -= 0.3;
+    this.nebula02.tilePositionY -= 0.15;
     this.parallaxStarField.tilePositionY -= 0.1;
+
+    // PLAYER ENGINES
+    this.player.anims.play("player_engine", true);
 
     // PLAYER MOVEMENT
     const speed = 300;
