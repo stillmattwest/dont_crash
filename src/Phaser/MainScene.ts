@@ -206,13 +206,13 @@ export default class MainScene extends Phaser.Scene {
       this.lastFired = now;
 
       const projectile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody =
-        this.projectiles.get(this.player.x, this.player.y);
+        this.projectiles.get(this.player.x, this.player.y - 25);
       if (projectile) {
         projectile.setActive(true);
         projectile.setVisible(true);
         projectile.body.enable = true;
-        projectile.body.reset(this.player.x, this.player.y);
-        projectile.body.velocity.y = -600;
+        projectile.body.reset(this.player.x, this.player.y - 25);
+        projectile.body.velocity.y = -700;
       }
     } else {
       return;
