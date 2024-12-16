@@ -8,6 +8,8 @@ export default class MainScene extends Phaser.Scene {
   private nebula01!: Phaser.GameObjects.TileSprite;
   private nebula02!: Phaser.GameObjects.TileSprite;
   private parallaxStarField!: Phaser.GameObjects.TileSprite;
+  private projectiles!: Phaser.Physics.Arcade.Group;
+  private lastFired?: number;
 
   constructor() {
     super({
@@ -27,6 +29,7 @@ export default class MainScene extends Phaser.Scene {
       frameWidth: 117,
       frameHeight: 95,
     });
+    this.load.image("player_laser_01", "assets/projectiles/green_laser_01.png");
   }
 
   create() {
@@ -89,6 +92,13 @@ export default class MainScene extends Phaser.Scene {
       repeat: -1,
     });
 
+    // add projectile pool
+    this.projectiles = this.physics.add.group({
+      classType: Phaser.Physics.Arcade.Sprite,
+      defaultKey: "player_laser_01",
+      maxSize: 100,
+    });
+
     // setup cursor keys
     if (this.input.keyboard) {
       this.cursors = this.input.keyboard.createCursorKeys();
@@ -109,6 +119,8 @@ export default class MainScene extends Phaser.Scene {
         this.cursors = this.input.keyboard.createCursorKeys();
       }
     }
+    // set lastFired variable
+    this.lastFired = this.time.now;
   }
 
   update() {
@@ -143,6 +155,12 @@ export default class MainScene extends Phaser.Scene {
         yVelocity = leftStickY * speed;
       }
 
+      if (this.pad.buttons[0]?.pressed) {
+        // fire main weapon
+        console.log("fire!");
+        this.fireProjectile();
+      }
+
       // Set the velocity of the player ship
       this.player.setVelocity(xVelocity, yVelocity);
     } else {
@@ -166,10 +184,38 @@ export default class MainScene extends Phaser.Scene {
       }
     }
 
-    // Example of button handling (e.g., firing a weapon on button press)
-    if (this.pad?.buttons[0]?.pressed) {
-      console.log("Button 0 pressed!");
-      // Trigger an action (like firing a weapon) here
-    }
+    // RECOVER PLAYER PROJECTILES
+    this.projectiles.children.each((proj) => {
+      const projectile =
+        proj as Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+
+      if (projectile.active && projectile.y < 0) {
+        this.projectiles.killAndHide(projectile);
+        projectile.body.enable = false;
+      }
+
+      return true; // Ensure the callback returns a boolean
+    });
   }
+
+  fireProjectile = () => {
+    const now = this.time.now;
+    const cooldown = 150;
+
+    if (now - this.lastFired! > cooldown) {
+      this.lastFired = now;
+
+      const projectile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody =
+        this.projectiles.get(this.player.x, this.player.y);
+      if (projectile) {
+        projectile.setActive(true);
+        projectile.setVisible(true);
+        projectile.body.enable = true;
+        projectile.body.reset(this.player.x, this.player.y);
+        projectile.body.velocity.y = -600;
+      }
+    } else {
+      return;
+    }
+  };
 }
