@@ -95,13 +95,20 @@ export default class MainScene extends Phaser.Scene {
     }
 
     // setup gamepads
-    this.input.gamepad?.once(
-      "connected",
-      (pad: Phaser.Input.Gamepad.Gamepad) => {
-        console.log(`gamepad connected`);
-        this.pad = pad;
+    if (this.input.gamepad) {
+      this.input.gamepad?.once(
+        "connected",
+        (pad: Phaser.Input.Gamepad.Gamepad) => {
+          console.log(`gamepad connected`);
+          this.pad = pad;
+        }
+      );
+    } else {
+      // setup cursor keys
+      if (this.input.keyboard) {
+        this.cursors = this.input.keyboard.createCursorKeys();
       }
-    );
+    }
   }
 
   update() {
@@ -115,24 +122,6 @@ export default class MainScene extends Phaser.Scene {
 
     // PLAYER MOVEMENT
     const speed = 300;
-    // KEYBOARD MOVEMENT
-    // horizontal player movement
-    if (this.cursors?.left.isDown) {
-      this.player.setVelocityX(-speed);
-    } else if (this.cursors?.right.isDown) {
-      this.player.setVelocityX(speed);
-    } else {
-      this.player.setVelocityX(0);
-    }
-
-    // vertical player movement
-    if (this.cursors?.up.isDown) {
-      this.player.setVelocityY(-speed);
-    } else if (this.cursors?.down.isDown) {
-      this.player.setVelocityY(speed);
-    } else {
-      this.player.setVelocityY(0);
-    }
 
     // GAMEPAD MOVEMENT
     if (this.pad) {
@@ -157,8 +146,24 @@ export default class MainScene extends Phaser.Scene {
       // Set the velocity of the player ship
       this.player.setVelocity(xVelocity, yVelocity);
     } else {
-      // No gamepad connected; stop the ship or handle fallback input
-      this.player.setVelocity(0, 0);
+      // KEYBOARD MOVEMENT
+      // horizontal player movement
+      if (this.cursors?.left.isDown) {
+        this.player.setVelocityX(-speed);
+      } else if (this.cursors?.right.isDown) {
+        this.player.setVelocityX(speed);
+      } else {
+        this.player.setVelocityX(0);
+      }
+
+      // vertical player movement
+      if (this.cursors?.up.isDown) {
+        this.player.setVelocityY(-speed);
+      } else if (this.cursors?.down.isDown) {
+        this.player.setVelocityY(speed);
+      } else {
+        this.player.setVelocityY(0);
+      }
     }
 
     // Example of button handling (e.g., firing a weapon on button press)
