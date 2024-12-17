@@ -10,6 +10,7 @@ export default class MainScene extends Phaser.Scene {
   private parallaxStarField!: Phaser.GameObjects.TileSprite;
   private projectiles!: Phaser.Physics.Arcade.Group;
   private lastFired?: number;
+  private laser01_sfx: Phaser.Sound.BaseSound;
 
   constructor() {
     super({
@@ -17,7 +18,7 @@ export default class MainScene extends Phaser.Scene {
     });
   }
 
-  preload() {
+  preload(): void {
     this.load.image("starField", "assets/starField/bg_space_seamless.png");
     this.load.image("nebula01", "assets/nebula/nebula2.png");
     this.load.image("nebula02", "assets/nebula/nebuladrystars.png");
@@ -30,6 +31,8 @@ export default class MainScene extends Phaser.Scene {
       frameHeight: 95,
     });
     this.load.image("player_laser_01", "assets/projectiles/green_laser_01.png");
+    // PROJECTILE SFX
+    this.load.audio("laser01_sfx", "assets/projectiles/sfx/laser01.mp3");
   }
 
   create() {
@@ -98,6 +101,9 @@ export default class MainScene extends Phaser.Scene {
       defaultKey: "player_laser_01",
       maxSize: 100,
     });
+
+    // SFX
+    this.laser01_sfx = this.sound.add("laser01_sfx");
 
     // setup cursor keys
     if (this.input.keyboard) {
@@ -208,6 +214,7 @@ export default class MainScene extends Phaser.Scene {
       const projectile: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody =
         this.projectiles.get(this.player.x, this.player.y - 25);
       if (projectile) {
+        this.laser01_sfx.play();
         projectile.setActive(true);
         projectile.setVisible(true);
         projectile.body.enable = true;
