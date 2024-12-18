@@ -11,6 +11,7 @@ export default class MainScene extends Phaser.Scene {
   private projectiles!: Phaser.Physics.Arcade.Group;
   private lastFired?: number;
   private laser01_sfx: Phaser.Sound.BaseSound;
+  private keyX!: Phaser.Input.Keyboard.Key;
 
   constructor() {
     super({
@@ -178,6 +179,12 @@ export default class MainScene extends Phaser.Scene {
         this.player.setVelocityX(speed);
       } else {
         this.player.setVelocityX(0);
+      }
+
+      // KEYBOARD FIRING CONTROLS
+      this.keyX = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
+      if (this.keyX.isDown) {
+        this.fireProjectile();
       }
 
       // vertical player movement
