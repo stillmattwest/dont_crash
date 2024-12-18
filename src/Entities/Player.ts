@@ -22,8 +22,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.setScale(0.5);
 
     // Initialize input
-    this.cursors = scene.input.keyboard.createCursorKeys();
-    this.keyX = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
+    this.cursors = scene!.input.keyboard!.createCursorKeys();
+    this.keyX = scene!.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.X);
 
     // Initialize gamepad support
     if (scene.input.gamepad) {
