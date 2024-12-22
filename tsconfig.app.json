@@ -23,7 +23,7 @@
     "noUncheckedSideEffectImports": true,
 
     /* Types */
-    "types": ["phaser", "react", "react-dom", "react/jsx-runtime"],
+    "types": ["phaser", "react", "react-dom"],
 
     /* Paths */
     "baseUrl": ".",
