@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import { Player } from "../Entities/Player";
 import { ParallaxBackground } from "../Entities/ParallaxBackground";
+import { Asteroid } from "../Entities/Asteroid";
 
 export default class MainScene extends Phaser.Scene {
   private player!: Player;

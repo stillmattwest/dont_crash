@@ -54,8 +54,7 @@ export class LoadingScene extends Phaser.Scene {
     // Load all game assets here
     this.loadBackgroundAssets();
     this.loadPlayerAssets();
-    this.loadEnemyAssets();
-    this.loadUIAssets();
+    this.loadAsteroidAssets();
     this.loadAudioAssets();
   }
 
@@ -75,6 +74,33 @@ export class LoadingScene extends Phaser.Scene {
       frameHeight: 95,
     });
     this.load.image("player_laser_01", "assets/projectiles/green_laser_01.png");
+  }
+
+  private loadAsteroidAssets(): void {
+    this.load.image(
+      "gray_asteroid_lg_01",
+      "assets/asteroids/gray/Meteor_1_A_Large.png"
+    );
+    this.load.image(
+      "gray_asteroid_lg_02",
+      "assets/asteroids/gray/Meteor_2_A_Large.png"
+    );
+    this.load.image(
+      "gray_asteroid_lg_03",
+      "assets/asteroids/gray/Meteor_3_A_Large.png"
+    );
+    this.load.image(
+      "red_asteroid_lg_01",
+      "assets/asteroids/red/Meteor_2_D_Large.png"
+    );
+    this.load.image(
+      "red_asteroid_lg_02",
+      "assets/asteroids/red/Meteor_3_D_Large.png"
+    );
+    this.load.image(
+      "red_asteroid_lg_02",
+      "assets/asteroids/red/Meteor_5_D_Large.png"
+    );
   }
 
   private loadEnemyAssets(): void {
