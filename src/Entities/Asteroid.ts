@@ -1,4 +1,6 @@
-class Asteroid extends Phaser.Physics.Arcade.Sprite {
+import { Physics } from "phaser";
+
+export class Asteroid extends Phaser.Physics.Arcade.Sprite {
   private static readonly SPRITE_KEYS = [
     "gray_asteroid_lg_01",
     "gray_asteroid_lg_02",
@@ -11,10 +13,10 @@ class Asteroid extends Phaser.Physics.Arcade.Sprite {
   private static pool: Asteroid[] = [];
   private static activeSprites: Set<string> = new Set();
 
-  constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, Asteroid.SPRITE_KEYS[0]);
+  constructor(scene: Phaser.Scene, x: number, y: number, spriteKey: string) {
+    super(scene, x, y, spriteKey);
     scene.physics.add.existing(this);
-
+    scene.add.existing(this);
     this.setupPhysics();
   }
 
@@ -23,11 +25,13 @@ class Asteroid extends Phaser.Physics.Arcade.Sprite {
     player: Phaser.Physics.Arcade.Sprite
   ): void {
     for (let i = 0; i < this.POOL_SIZE; i++) {
-      const asteroid = new Asteroid(scene, 0, 0);
+      const randomKey = Phaser.Math.RND.pick(this.SPRITE_KEYS);
+      const asteroid = new Asteroid(scene, 0, 0, randomKey);
       asteroid.setActive(false);
       asteroid.setVisible(false);
       this.pool.push(asteroid);
       asteroid.setupCollisions(player, this.pool);
+      this.activeSprites.add(randomKey);
     }
   }
 
@@ -37,22 +41,28 @@ class Asteroid extends Phaser.Physics.Arcade.Sprite {
 
     if (asteroid) {
       asteroid.reset(x, y);
+      asteroid.setRandomMovement();
+      asteroid.setScale(0.5);
     }
     return asteroid;
   }
 
   private setupPhysics(): void {
-    this.setCollideWorldBounds(true);
+    this.setCollideWorldBounds(false);
     this.setBounce(1, 1);
     this.setDrag(0);
   }
 
   private setRandomMovement(): void {
-    this.setVelocity(
-      Phaser.Math.Between(-100, 100),
-      Phaser.Math.Between(-100, 100)
-    );
-    this.setAngularVelocity(Phaser.Math.Between(-100, 100));
+    let xVelocity: number;
+    let yVelocity = Phaser.Math.Between(50, 100);
+    if (this.body!.velocity.x < 0) {
+      xVelocity = Phaser.Math.Between(10, 25);
+    } else {
+      xVelocity = Phaser.Math.Between(-10, -25);
+    }
+    this.setVelocity(xVelocity, yVelocity);
+    this.setAngularVelocity(Phaser.Math.Between(-20, 20));
   }
 
   public reset(x: number, y: number): void {

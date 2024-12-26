@@ -19,6 +19,12 @@ export default class MainScene extends Phaser.Scene {
 
     // add player
     this.player = new Player(this, 600, 400);
+
+    // intialize asteroid pool
+    Asteroid.initPool(this, this.player);
+
+    // temp. spawn a single asteroid
+    this.spawnAsteroid();
   }
 
   update() {
@@ -27,5 +33,13 @@ export default class MainScene extends Phaser.Scene {
 
     // PLAYER UPDATE
     this.player.update();
+  }
+
+  private spawnAsteroid(): void {
+    // Spawn at a random position along the edges of the screen
+    let y = -300;
+    let x = Phaser.Math.RND.between(100, this.scale.width - 100);
+
+    Asteroid.spawn(x, y);
   }
 }

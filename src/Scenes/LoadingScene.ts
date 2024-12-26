@@ -98,7 +98,7 @@ export class LoadingScene extends Phaser.Scene {
       "assets/asteroids/red/Meteor_3_D_Large.png"
     );
     this.load.image(
-      "red_asteroid_lg_02",
+      "red_asteroid_lg_03",
       "assets/asteroids/red/Meteor_5_D_Large.png"
     );
   }

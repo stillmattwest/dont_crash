@@ -10,4 +10,9 @@ export default defineConfig({
     }),
     basicSsl(),
   ],
+  css: {
+    modules: {
+      localsConvention: "camelCaseOnly",
+    },
+  },
 });
