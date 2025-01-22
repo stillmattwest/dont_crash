@@ -14,17 +14,29 @@ export default class MainScene extends Phaser.Scene {
   }
 
   create() {
+    // for debugging. adds visible physics bodies
+    this.physics.world.createDebugGraphic();
+
     // add starField background
     this.background = new ParallaxBackground(this);
 
     // add player
     this.player = new Player(this, 600, 400);
 
-    // intialize asteroid pool
-    Asteroid.initPool(this, this.player);
+    // initialize asteroid pool
+    Asteroid.initPool(this);
 
     // temp. spawn a single asteroid
     this.spawnAsteroid();
+
+    // Set up collision between asteroids and player
+    this.physics.add.collider(
+      this.player,
+      Asteroid.group, // Now using the static group property
+      this.handleCollision,
+      undefined,
+      this
+    );
   }
 
   update() {
@@ -40,6 +52,11 @@ export default class MainScene extends Phaser.Scene {
     let y = -300;
     let x = Phaser.Math.RND.between(100, this.scale.width - 100);
 
-    Asteroid.spawn(x, y);
+    Asteroid.spawn(x, y, this); // Added 'this' as the scene parameter
+  }
+
+  private handleCollision(_obj1: any, _obj2: any) {
+    console.log("Collision!");
+    // Add your collision logic here
   }
 }

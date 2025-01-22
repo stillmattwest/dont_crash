@@ -1,105 +1,86 @@
-import { Physics } from "phaser";
+import Phaser from "phaser";
 
 export class Asteroid extends Phaser.Physics.Arcade.Sprite {
-  private static readonly SPRITE_KEYS = [
-    "gray_asteroid_lg_01",
-    "gray_asteroid_lg_02",
-    "gray_asteroid_lg_03",
-    "red_asteroid_lg_01",
-    "red_asteroid_lg_02",
-    "red_asteroid_lg_03",
+  declare body: Phaser.Physics.Arcade.Body;
+
+  public static group: Phaser.Physics.Arcade.Group;
+
+  // Asset keys for different asteroid types
+  private static xlAsteroids = ["xl_red_01"];
+  private static lgAsteroids = [
+    "lg_gray_01",
+    "lg_gray_02",
+    "lg_red_01",
+    "lg_red_02",
   ];
-  private static readonly POOL_SIZE = 10;
-  private static pool: Asteroid[] = [];
-  private static activeSprites: Set<string> = new Set();
+  private static mdAsteroids = [
+    "md_gray_01",
+    "md_gray_02",
+    "md_red_01",
+    "md_red_02",
+  ];
 
-  constructor(scene: Phaser.Scene, x: number, y: number, spriteKey: string) {
-    super(scene, x, y, spriteKey);
-    scene.physics.add.existing(this);
-    scene.add.existing(this);
-    this.setupPhysics();
-  }
+  static initPool(scene: Phaser.Scene): void {
+    // Create physics group for asteroids
+    this.group = scene.physics.add.group({
+      classType: Asteroid,
+      maxSize: 20,
+      runChildUpdate: true,
+    });
 
-  public static initPool(
-    scene: Phaser.Scene,
-    player: Phaser.Physics.Arcade.Sprite
-  ): void {
-    for (let i = 0; i < this.POOL_SIZE; i++) {
-      const randomKey = Phaser.Math.RND.pick(this.SPRITE_KEYS);
-      const asteroid = new Asteroid(scene, 0, 0, randomKey);
+    // Pre-create some asteroids
+    for (let i = 0; i < 10; i++) {
+      const asteroid = new Asteroid(scene, 0, 0, this.getRandomTextureKey());
+      this.group.add(asteroid, true);
       asteroid.setActive(false);
       asteroid.setVisible(false);
-      this.pool.push(asteroid);
-      asteroid.setupCollisions(player, this.pool);
-      this.activeSprites.add(randomKey);
     }
   }
 
-  public static spawn(x: number, y: number): Asteroid | undefined {
-    const inactiveAsteroids = this.pool.filter((a) => !a.active);
-    const asteroid = Phaser.Math.RND.pick(inactiveAsteroids);
+  static spawn(x: number, y: number, scene: Phaser.Scene): Asteroid | null {
+    const asteroid = this.group.get(x, y) as Asteroid;
 
-    if (asteroid) {
-      asteroid.reset(x, y);
-      asteroid.setRandomMovement();
-      asteroid.setScale(0.5);
-    }
+    if (!asteroid) return null;
+
+    asteroid.setActive(true);
+    asteroid.setVisible(true);
+
+    // Reset asteroid properties
+    asteroid.setTexture(this.getRandomTextureKey());
+    asteroid.setPosition(x, y);
+
+    // Add random rotation and velocity
+    const angle = Phaser.Math.Between(0, 360);
+    const speed = Phaser.Math.Between(50, 150);
+
+    scene.physics.velocityFromAngle(angle, speed, asteroid.body.velocity);
+    asteroid.setAngularVelocity(Phaser.Math.Between(-100, 100));
+
     return asteroid;
   }
 
-  private setupPhysics(): void {
-    this.setCollideWorldBounds(false);
-    this.setBounce(1, 1);
-    this.setDrag(0);
+  private static getRandomTextureKey(): string {
+    // Randomly select from one of the asteroid types
+    const asteroidSets = [this.xlAsteroids, this.lgAsteroids, this.mdAsteroids];
+    const selectedSet = Phaser.Math.RND.pick(asteroidSets);
+    return Phaser.Math.RND.pick(selectedSet);
   }
 
-  private setRandomMovement(): void {
-    let xVelocity: number;
-    let yVelocity = Phaser.Math.Between(50, 100);
-    if (this.body!.velocity.x < 0) {
-      xVelocity = Phaser.Math.Between(10, 25);
-    } else {
-      xVelocity = Phaser.Math.Between(-10, -25);
-    }
-    this.setVelocity(xVelocity, yVelocity);
-    this.setAngularVelocity(Phaser.Math.Between(-20, 20));
+  constructor(scene: Phaser.Scene, x: number, y: number, texture: string) {
+    super(scene, x, y, texture);
+
+    // Enable physics on this sprite
+    scene.physics.world.enable(this);
+
+    // Set up collision body
+    this.body.setCircle(this.width / 2);
+    this.body.setBounce(1, 1);
+    this.body.setCollideWorldBounds(true);
   }
 
-  public reset(x: number, y: number): void {
-    const availableSprites = Asteroid.SPRITE_KEYS.filter(
-      (key) => !Asteroid.activeSprites.has(key)
-    );
-
-    const spriteKey =
-      availableSprites.length > 0
-        ? Phaser.Math.RND.pick(availableSprites)
-        : Phaser.Math.RND.pick(Asteroid.SPRITE_KEYS);
-
-    if (this.texture.key) {
-      Asteroid.activeSprites.delete(this.texture.key);
-    }
-
-    Asteroid.activeSprites.add(spriteKey);
-
-    this.setTexture(spriteKey);
-    this.setPosition(x, y);
-    this.setActive(true);
-    this.setVisible(true);
-
-    this.body!.enable = true;
-    this.setRandomMovement();
-  }
-
-  public setupCollisions(
-    player: Phaser.Physics.Arcade.Sprite,
-    asteroidPool: Asteroid[]
-  ): void {
-    this.scene.physics.add.collider(this, player);
-    this.scene.physics.add.collider(this, asteroidPool);
-  }
-
-  public destroy(fromScene?: boolean): void {
-    Asteroid.activeSprites.delete(this.texture.key);
-    super.destroy(fromScene);
+  kill(): void {
+    this.setActive(false);
+    this.setVisible(false);
+    this.body.stop();
   }
 }

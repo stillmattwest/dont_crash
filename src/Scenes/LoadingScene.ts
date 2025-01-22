@@ -6,6 +6,9 @@ export class LoadingScene extends Phaser.Scene {
   }
 
   preload(): void {
+    this.load.on("loaderror", (file: any) => {
+      console.error("Error loading asset:", file);
+    });
     // Create loading bar
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
@@ -59,9 +62,9 @@ export class LoadingScene extends Phaser.Scene {
   }
 
   private loadBackgroundAssets(): void {
-    this.load.image("starField", "assets/starField/bg_space_seamless.png");
-    this.load.image("nebula01", "assets/nebula/nebula2.png");
-    this.load.image("nebula02", "assets/nebula/nebuladrystars.png");
+    this.load.image("starField", "/assets/starField/bg_space_seamless.png");
+    this.load.image("nebula01", "/assets/nebula/nebula2.png");
+    this.load.image("nebula02", "/assets/nebula/nebuladrystars.png");
     this.load.image(
       "parallaxStarField",
       "assets/starField/bd_space_seamless_fl1.png"
@@ -69,47 +72,35 @@ export class LoadingScene extends Phaser.Scene {
   }
 
   private loadPlayerAssets(): void {
-    this.load.spritesheet("player", "assets/player/player_blue_sheet.png", {
+    this.load.spritesheet("player", "/assets/player/player_blue_sheet.png", {
       frameWidth: 117,
       frameHeight: 95,
     });
-    this.load.image("player_laser_01", "assets/projectiles/green_laser_01.png");
+    this.load.image(
+      "player_laser_01",
+      "/assets/projectiles/green_laser_01.png"
+    );
   }
 
   private loadAsteroidAssets(): void {
-    this.load.image(
-      "gray_asteroid_lg_01",
-      "assets/asteroids/gray/Meteor_1_A_Large.png"
-    );
-    this.load.image(
-      "gray_asteroid_lg_02",
-      "assets/asteroids/gray/Meteor_2_A_Large.png"
-    );
-    this.load.image(
-      "gray_asteroid_lg_03",
-      "assets/asteroids/gray/Meteor_3_A_Large.png"
-    );
-    this.load.image(
-      "red_asteroid_lg_01",
-      "assets/asteroids/red/Meteor_2_D_Large.png"
-    );
-    this.load.image(
-      "red_asteroid_lg_02",
-      "assets/asteroids/red/Meteor_3_D_Large.png"
-    );
-    this.load.image(
-      "red_asteroid_lg_03",
-      "assets/asteroids/red/Meteor_5_D_Large.png"
-    );
+    this.load.image("lg_gray_01", "/assets/asteroids/lg_gray_01.png");
+    this.load.image("lg_gray_02", "/assets/asteroids/lg_gray_02.png");
+    this.load.image("lg_red_01", "/assets/asteroids/lg_red_01.png");
+    this.load.image("lg_red_02", "/assets/asteroids/lg_red_02.png");
+    this.load.image("md_gray_01", "/assets/asteroids/md_gray_01.png");
+    this.load.image("md_gray_02", "/assets/asteroids/md_gray_02.png");
+    this.load.image("md_red_01", "/assets/asteroids/md_red_01.png");
+    this.load.image("md_red_02", "/assets/asteroids/md_red_02.png");
+    this.load.image("xl_red_01", "/assets/asteroids/xl_red_01.png");
   }
 
-  private loadEnemyAssets(): void {
-    // Add enemy assets here as your game grows
-  }
+  // private loadEnemyAssets(): void {
+  //   // Add enemy assets here as your game grows
+  // }
 
-  private loadUIAssets(): void {
-    // Add UI assets here
-  }
+  // private loadUIAssets(): void {
+  //   // Add UI assets here
+  // }
 
   private loadAudioAssets(): void {
     this.load.audio("laser01_sfx", "assets/projectiles/sfx/laser01.mp3");
