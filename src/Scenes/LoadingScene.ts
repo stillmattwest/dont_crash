@@ -80,15 +80,27 @@ export class LoadingScene extends Phaser.Scene {
   }
 
   private loadAsteroidAssets(): void {
-    this.load.image("lg_gray_01", "assets/asteroids/lg_gray_01.png");
-    this.load.image("lg_gray_02", "assets/asteroids/lg_gray_02.png");
-    this.load.image("lg_red_01", "assets/asteroids/lg_red_01.png");
-    this.load.image("lg_red_02", "assets/asteroids/lg_red_02.png");
+    console.log("Loading asteroid assets...");
+
+    // Medium asteroids
     this.load.image("md_gray_01", "assets/asteroids/md_gray_01.png");
     this.load.image("md_gray_02", "assets/asteroids/md_gray_02.png");
     this.load.image("md_red_01", "assets/asteroids/md_red_01.png");
     this.load.image("md_red_02", "assets/asteroids/md_red_02.png");
+
+    // Large asteroids
+    this.load.image("lg_gray_01", "assets/asteroids/lg_gray_01.png");
+    this.load.image("lg_gray_02", "assets/asteroids/lg_gray_02.png");
+    this.load.image("lg_red_01", "assets/asteroids/lg_red_01.png");
+    this.load.image("lg_red_02", "assets/asteroids/lg_red_02.png");
+
+    // Extra large asteroids
     this.load.image("xl_red_01", "assets/asteroids/xl_red_01.png");
+
+    // Add file load error handler
+    this.load.on("loaderror", (file: any) => {
+      console.error("Failed to load asset:", file.key, file.src);
+    });
   }
 
   // private loadEnemyAssets(): void {

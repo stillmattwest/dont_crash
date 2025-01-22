@@ -58,8 +58,8 @@ export class Asteroid extends Phaser.Physics.Arcade.Sprite {
   }
 
   private static getRandomTextureKey(): string {
-    // Randomly select from one of the asteroid types
-    const asteroidSets = [this.xlAsteroids, this.lgAsteroids, this.mdAsteroids];
+    // Temporarily only use large asteroids until we fix medium ones
+    const asteroidSets = [this.lgAsteroids]; // Remove mdAsteroids and xlAsteroids
     const selectedSet = Phaser.Math.RND.pick(asteroidSets);
     const texture = Phaser.Math.RND.pick(selectedSet);
     console.log("Selected asteroid texture:", texture); // Debug log
@@ -72,26 +72,36 @@ export class Asteroid extends Phaser.Physics.Arcade.Sprite {
     // Enable physics on this sprite
     scene.physics.world.enable(this);
 
-    // Make asteroid more visible
-    this.setScale(0.5); // Adjust this value as needed
+    // Set scale based on asteroid size
+    if (texture.startsWith("md_")) {
+      this.setScale(2.0); // Medium asteroids at 200% size
+    } else {
+      this.setScale(1.0); // Keep original scale for large and xl asteroids
+    }
+
     this.setTint(0xffffff); // Full brightness
 
-    // Set up collision body
-    this.body.setCircle(this.width / 3); // Smaller collision circle
+    // Get the actual texture dimensions
+    const frame = scene.textures.get(texture).getSourceImage();
+    const scaledWidth = frame.width * this.scaleX;
+    const radius = (scaledWidth / 2) * 0.9; // 10% smaller than sprite radius
+
+    // Set up collision body after scaling
+    this.body.setCircle(
+      radius,
+      (frame.width - radius * 2) / 2, // Offset X to center
+      (frame.height - radius * 2) / 2 // Offset Y to center
+    );
     this.body.setBounce(1, 1);
     this.body.setCollideWorldBounds(true);
 
-    // Debug: Draw border directly on the scene
-    const debugRect = scene.add.rectangle(
-      x,
-      y,
-      this.width,
-      this.height,
-      0xff0000,
-      0 // alpha of 0 for no fill
-    );
-    debugRect.setStrokeStyle(2, 0xff0000); // 2px red border
-    debugRect.setOrigin(0.5);
+    // Debug visualization
+    if (scene.physics.world.drawDebug) {
+      // Only add if debug is enabled
+      const debugCircle = scene.add.circle(x, y, radius, 0x00ff00, 0);
+      debugCircle.setStrokeStyle(1, 0x00ff00); // Green circle for collision visualization
+      console.log("Debug circle radius:", radius); // Debug log
+    }
   }
 
   kill(): void {
