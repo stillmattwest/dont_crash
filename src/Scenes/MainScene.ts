@@ -14,6 +14,24 @@ export default class MainScene extends Phaser.Scene {
   }
 
   create() {
+    console.log("MainScene create starting");
+
+    // Check if at least one asteroid texture is loaded
+    const asteroidSets = [
+      ["xl_red_01"],
+      ["lg_gray_01", "lg_gray_02", "lg_red_01", "lg_red_02"],
+      ["md_gray_01", "md_gray_02", "md_red_01", "md_red_02"],
+    ];
+
+    const hasAnyAsteroidTexture = asteroidSets.some((set) =>
+      set.some((key) => this.textures.exists(key))
+    );
+
+    if (!hasAnyAsteroidTexture) {
+      console.error("No asteroid textures are loaded!");
+      return;
+    }
+
     // for debugging. adds visible physics bodies
     this.physics.world.createDebugGraphic();
 
@@ -41,22 +59,53 @@ export default class MainScene extends Phaser.Scene {
 
   update() {
     // PARALLAX BACKGROUND MOVEMENT
-    this.background.update();
+    if (this.background) {
+      this.background.update();
+    }
 
     // PLAYER UPDATE
-    this.player.update();
+    if (this.player) {
+      this.player.update();
+    }
   }
 
   private spawnAsteroid(): void {
-    // Spawn at a random position along the edges of the screen
-    let y = -300;
-    let x = Phaser.Math.RND.between(100, this.scale.width - 100);
+    // Spawn at a random position along the top of the screen
+    const x = Phaser.Math.Between(100, this.scale.width - 100);
+    const y = -100; // Spawn above the screen
 
-    Asteroid.spawn(x, y, this); // Added 'this' as the scene parameter
+    const asteroid = Asteroid.spawn(x, y, this);
+    if (asteroid) {
+      // Set primarily downward velocity with slight horizontal variation
+      const horizontalSpeed = Phaser.Math.Between(-50, 50); // Mild left/right movement
+      const verticalSpeed = Phaser.Math.Between(100, 200); // Faster downward movement
+
+      (asteroid.body as Phaser.Physics.Arcade.Body).setVelocity(
+        horizontalSpeed,
+        verticalSpeed
+      );
+    }
   }
 
-  private handleCollision(_obj1: any, _obj2: any) {
-    console.log("Collision!");
-    // Add your collision logic here
+  private handleCollision(obj1: any, obj2: any) {
+    const player = obj1 as Player;
+    const asteroid = obj2 as Asteroid;
+
+    // Strong rebound for player, minimal for asteroid
+    const rebound = new Phaser.Math.Vector2()
+      .copy((player.body as Phaser.Physics.Arcade.Body).velocity)
+      .normalize()
+      .scale(-300);
+
+    (player.body as Phaser.Physics.Arcade.Body).setVelocity(
+      rebound.x,
+      rebound.y
+    );
+
+    // Minimal effect on asteroid (10% of player's rebound)
+    (asteroid.body as Phaser.Physics.Arcade.Body).setVelocity(
+      -rebound.x * 0.1,
+      -rebound.y * 0.1
+    );
   }
 }

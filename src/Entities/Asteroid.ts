@@ -38,23 +38,21 @@ export class Asteroid extends Phaser.Physics.Arcade.Sprite {
   }
 
   static spawn(x: number, y: number, scene: Phaser.Scene): Asteroid | null {
-    const asteroid = this.group.get(x, y) as Asteroid;
+    const texture = this.getRandomTextureKey();
+    console.log("Spawning asteroid with texture:", texture); // Debug log
 
+    const asteroid = this.group.get(x, y, texture) as Asteroid;
     if (!asteroid) return null;
 
     asteroid.setActive(true);
     asteroid.setVisible(true);
-
-    // Reset asteroid properties
-    asteroid.setTexture(this.getRandomTextureKey());
     asteroid.setPosition(x, y);
 
-    // Add random rotation and velocity
-    const angle = Phaser.Math.Between(0, 360);
-    const speed = Phaser.Math.Between(50, 150);
-
-    scene.physics.velocityFromAngle(angle, speed, asteroid.body.velocity);
-    asteroid.setAngularVelocity(Phaser.Math.Between(-100, 100));
+    // Debug: Log asteroid properties
+    console.log("Asteroid position:", x, y);
+    console.log("Asteroid scale:", asteroid.scaleX, asteroid.scaleY);
+    console.log("Asteroid size:", asteroid.width, asteroid.height);
+    console.log("Asteroid visible:", asteroid.visible);
 
     return asteroid;
   }
@@ -63,7 +61,9 @@ export class Asteroid extends Phaser.Physics.Arcade.Sprite {
     // Randomly select from one of the asteroid types
     const asteroidSets = [this.xlAsteroids, this.lgAsteroids, this.mdAsteroids];
     const selectedSet = Phaser.Math.RND.pick(asteroidSets);
-    return Phaser.Math.RND.pick(selectedSet);
+    const texture = Phaser.Math.RND.pick(selectedSet);
+    console.log("Selected asteroid texture:", texture); // Debug log
+    return texture;
   }
 
   constructor(scene: Phaser.Scene, x: number, y: number, texture: string) {
@@ -72,10 +72,26 @@ export class Asteroid extends Phaser.Physics.Arcade.Sprite {
     // Enable physics on this sprite
     scene.physics.world.enable(this);
 
+    // Make asteroid more visible
+    this.setScale(0.5); // Adjust this value as needed
+    this.setTint(0xffffff); // Full brightness
+
     // Set up collision body
-    this.body.setCircle(this.width / 2);
+    this.body.setCircle(this.width / 3); // Smaller collision circle
     this.body.setBounce(1, 1);
     this.body.setCollideWorldBounds(true);
+
+    // Debug: Draw border directly on the scene
+    const debugRect = scene.add.rectangle(
+      x,
+      y,
+      this.width,
+      this.height,
+      0xff0000,
+      0 // alpha of 0 for no fill
+    );
+    debugRect.setStrokeStyle(2, 0xff0000); // 2px red border
+    debugRect.setOrigin(0.5);
   }
 
   kill(): void {
